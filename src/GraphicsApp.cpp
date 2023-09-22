@@ -1,6 +1,8 @@
 #include "GraphicsApp.hpp"
 #include "ShaderLoader.hpp"
+#include "Object.hpp"
 
+int GNumberOfVertices = 0;
 
 void GraphicsApp::GetOpenGLVersionInfo() {
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
@@ -86,7 +88,7 @@ void GraphicsApp::VertexSpecification() {
         -0.5f,  0.5f,  0.5f, 0.0f, 1.0f, 0.0f,                   
     }; */
 
-    const std::vector<GLfloat> vertexData{
+    /* const std::vector<GLfloat> vertexData{
         -0.5f, -0.5f, -0.5f,
         0.5f, -0.5f, -0.5f,
         0.5f,  0.5f, -0.5f,
@@ -95,9 +97,11 @@ void GraphicsApp::VertexSpecification() {
         0.5f, -0.5f,  0.5f,
         0.5f,  0.5f,  0.5f,
         -0.5f,  0.5f,  0.5f,                
-    };
+    }; */
 
-  
+    Object bunny("./src/ObjFiles/stanfordbunny.obj");
+
+    const std::vector<GLfloat> vertexData(bunny.vertices());
 
     glGenVertexArrays(1, &gVertexArrayObject);
     //Selecting
@@ -109,12 +113,9 @@ void GraphicsApp::VertexSpecification() {
 
    
 
-    const std::vector<GLuint> indexBufferData {0, 1, 2, 2, 3, 0,
-                                                4, 5, 6, 6, 7, 4,
-                                                0, 4, 7, 7, 3, 0,
-                                                1, 5, 6, 6, 2, 1,
-                                                0, 1, 5, 5, 4, 0,
-                                                2, 3, 7, 7, 6, 2};
+    const std::vector<GLuint> indexBufferData(bunny.indices());
+
+    GNumberOfVertices = indexBufferData.size();
                                                 
     glGenBuffers(1, &gIndexBufferObject);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, gIndexBufferObject);
@@ -122,7 +123,7 @@ void GraphicsApp::VertexSpecification() {
 
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 3, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
     
     //glEnableVertexAttribArray(1);
     //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*)(sizeof(GL_FLOAT)*3));
@@ -227,7 +228,7 @@ void GraphicsApp::Draw() {
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
     //glDrawArrays(GL_TRIANGLES, 0, 6);
-    glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, GNumberOfVertices, GL_UNSIGNED_INT, 0);
     
 
 }
