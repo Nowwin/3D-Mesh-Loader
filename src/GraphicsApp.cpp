@@ -3,6 +3,7 @@
 #include "Object.hpp"
 
 int GNumberOfVertices = 0;
+bool wireframeMode = false;
 
 void GraphicsApp::GetOpenGLVersionInfo() {
     std::cout << "Vendor: " << glGetString(GL_VENDOR) << std::endl;
@@ -99,7 +100,7 @@ void GraphicsApp::VertexSpecification() {
         -0.5f,  0.5f,  0.5f,                
     }; */
 
-    Object bunny("./src/ObjFiles/stanfordbunny.obj");
+    Object bunny("./src/ObjFiles/ver1.obj");
 
     const std::vector<GLfloat> vertexData(bunny.vertices());
 
@@ -123,14 +124,14 @@ void GraphicsApp::VertexSpecification() {
 
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (void*)0);
     
-    //glEnableVertexAttribArray(1);
-    //glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*)(sizeof(GL_FLOAT)*3));
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GL_FLOAT) * 6, (GLvoid*)(sizeof(GL_FLOAT)*3));
 
     glBindVertexArray(0);    
     glDisableVertexAttribArray(0);
-    //glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(1);
     
 }
 
@@ -176,6 +177,20 @@ void GraphicsApp::Input(){
             m_uRotation += 1.00f;
             std::cout << "Rotation: " << m_uRotation << std::endl;
         }
+
+        if (event.type == SDL_KEYDOWN)
+        {
+            switch (event.key.keysym.sym) {
+                    case SDLK_w:
+                        // Handle 'W' key press here
+                        printf("W key pressed!\n");
+                        wireframeMode = !wireframeMode;
+                        break;
+                    default:
+                        break;
+            
+             }
+        }
         
     }
 }
@@ -219,6 +234,17 @@ void GraphicsApp::PreDraw() {
     } else {
         std::cout << "No location found" << std::endl;
     }
+
+    GLint isWireframeModeLocation = glGetUniformLocation(gGraphicsPipelineShaderProgram, "isWireframeMode");
+
+    //WireFrame Mode
+
+    if (isWireframeModeLocation >= 0)
+    {
+        glUniform1i(isWireframeModeLocation, wireframeMode);
+    } else {
+        std::cout << "No location found" << std::endl;
+    }
     
 }
 
@@ -228,6 +254,16 @@ void GraphicsApp::Draw() {
     glBindBuffer(GL_ARRAY_BUFFER, gVertexBufferObject);
 
     //glDrawArrays(GL_TRIANGLES, 0, 6);
+    if (wireframeMode)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    } else
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    }
+    
+    
+
     glDrawElements(GL_TRIANGLES, GNumberOfVertices, GL_UNSIGNED_INT, 0);
     
 

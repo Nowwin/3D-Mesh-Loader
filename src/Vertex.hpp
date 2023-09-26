@@ -10,4 +10,15 @@ struct Vertex {
 
     Vertex(const glm::vec3& position, const glm::vec3& normal)
         : position_(position), normal_(normal){};
+
+    Vertex(const glm::vec3& position)
+        : position_(position), normal_(glm::vec3(0.0f)){};
+
+    void updateNormal(const glm::vec3& normal) {
+        normal_ = normal;
+    } 
+
+    void updatePosition(const glm::vec3& position) {
+        position_ = position;
+    }    
   };
